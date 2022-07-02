@@ -1,6 +1,11 @@
 # esbuild-vue2
 在 esbuild 中编译vue2.0的文件
 
+
+[![OSCS Status](https://www.oscs1024.com/platform/badge/wulinsheng123/esbuild-vue2.svg?size=small)](https://www.oscs1024.com/project/wulinsheng123/esbuild-vue2?ref=badge_small)
+
+
+
 # 使用方式
 ```js
 import { build } from 'esbuild'
