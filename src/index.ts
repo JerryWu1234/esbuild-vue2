@@ -1,12 +1,12 @@
 import { relative } from 'path'
-import type { Plugin } from 'esbuild'
+import type { OnLoadResult, Plugin } from 'esbuild'
 import type { CompilerResult, StylesType } from './compiler'
 import { codeAssemble, compiler } from './compiler'
 
 const STATIC_QUERY = '?esbuildvue-css'
-interface Result {
-  loader: 'js' | 'ts'
-  contents: string
+interface EsbuildError {
+  text: string
+  detail: any
 }
 export interface Option {
   extractscss: boolean
@@ -24,11 +24,15 @@ export default (option: Option = { extractscss: false }): Plugin => ({
       const filename = `${relative(process.cwd(), path)}`
       const queryFilename = `${filename}${STATIC_QUERY}`
       const result = compiler(path, filename)
+      const error = handleError(result)
+      if (error)
+        return { errors: error } as OnLoadResult
 
       getExtractscss(result.styles, context, queryFilename)
+
       handleExtract(result, context)
 
-      return codeAssemble(result, filename, code => context.option.extractscss ? addCode(code, queryFilename) : code) as Result
+      return codeAssemble(result, filename, code => context.option.extractscss ? addCode(code, queryFilename) : code) as OnLoadResult
     })
 
     if (context.option.extractscss) {
@@ -58,6 +62,34 @@ export default (option: Option = { extractscss: false }): Plugin => ({
 
     function addCode(code: string, filename: string) {
       return code += `\n import '${filename}'\n `
+    }
+
+    function handleError(result: CompilerResult) {
+      if (result.template?.errors.length) {
+        return result.template.errors.map(message => ({
+          text: message,
+          detail: message,
+        }))
+      }
+
+      if (result.styles.length > 0) {
+        const errorList: EsbuildError[] = []
+        result.styles.forEach((style) => {
+          if (style.errors.length) {
+            const error = {
+              text: '',
+              detail: '',
+            }
+            style.errors.forEach((e: any) => {
+              error.text = `error msg: ${e.reason}}, colunm: ${e.colunm}, line: ${e.line}`
+              error.detail = e
+              errorList.push(error)
+            })
+          }
+        })
+        return errorList
+      }
+      return null
     }
   },
 })
