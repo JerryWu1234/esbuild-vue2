@@ -5,12 +5,13 @@ describe('esbuild', () => {
   it('build', async () => {
     const result = await build({
       bundle: true,
+      outdir: './dist',
       entryPoints: ['./fixture/example.vue'],
-      plugins: [plugin()],
+      plugins: [plugin({ extractscss: true })],
       write: false,
     })
     const src = String.fromCodePoint(...result.outputFiles[0].contents)
-    expect(result.outputFiles).toHaveLength(1)
+    expect(result.outputFiles).toHaveLength(2)
     expect(src).contain('232')
   })
 })
