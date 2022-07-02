@@ -25,14 +25,15 @@ export default (option: Option = { extractscss: false }): Plugin => ({
       const queryFilename = `${filename}${STATIC_QUERY}`
       const result = compiler(path, filename)
       const error = handleError(result)
-      if (error)
+      if (error?.length)
         return { errors: error } as OnLoadResult
 
       getExtractscss(result.styles, context, queryFilename)
 
-      handleExtract(result, context)
-
-      return codeAssemble(result, filename, code => context.option.extractscss ? addCode(code, queryFilename) : code) as OnLoadResult
+      return codeAssemble(result, filename, (code) => {
+        handleExtract(result, context)
+        return context.option.extractscss ? addCode(code, queryFilename) : code
+      }) as OnLoadResult
     })
 
     if (context.option.extractscss) {
