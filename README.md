@@ -24,3 +24,31 @@ build({
 * default: false
 
 编译时单独编译 vue 文件里的 css
+
+#### createCompilerOption
+
+* type: Options
+* default: {}
+```ts
+interface Options {
+  script?: ScriptOptions | undefined
+  style?: StyleOptions | undefined
+  template?: TemplateOptions | undefined
+}
+```
+引用 [@vue/component-compiler](https://www.npmjs.com/package/@vue/component-compiler) 的参数
+
+#### AssembleOptions
+
+* type: AssembleOptions
+* default: {}
+```ts
+interface AssembleOptions {
+  isWebComponent?: boolean
+  normalizer?: string
+  styleInjector?: string
+  styleInjectorSSR?: string
+  styleInjectorShadow?: string
+}
+```
+引用 [@vue/component-compiler](https://www.npmjs.com/package/@vue/component-compiler) 的参数

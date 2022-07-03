@@ -1,5 +1,6 @@
 import { relative } from 'path'
 import type { OnLoadResult, Plugin } from 'esbuild'
+import type { AssembleOptions, ScriptOptions, StyleOptions, TemplateOptions } from '@vue/component-compiler'
 import type { CompilerResult, StylesType } from './compiler'
 import { codeAssemble, compiler } from './compiler'
 
@@ -8,8 +9,21 @@ interface EsbuildError {
   text: string
   detail: any
 }
+
+interface CreateDefaultCompiler {
+  script?: ScriptOptions | undefined
+  style?: StyleOptions | undefined
+  template?: TemplateOptions | undefined
+}
+
 export interface Option {
-  extractscss: boolean
+  extractscss?: boolean
+  createCompilerOption?: CreateDefaultCompiler
+  assembleOptions?: AssembleOptions
+}
+export interface Context {
+  option: Option
+  cssMap: Map<string, string>
 }
 
 export default (option: Option = { extractscss: false }): Plugin => ({
@@ -23,14 +37,14 @@ export default (option: Option = { extractscss: false }): Plugin => ({
     build.onLoad({ filter: /[^/]\.vue$/ }, ({ path }) => {
       const filename = `${relative(process.cwd(), path)}`
       const queryFilename = `${filename}${STATIC_QUERY}`
-      const result = compiler(path, filename)
+      const result = compiler(path, filename, context)
       const error = handleError(result)
       if (error?.length)
         return { errors: error } as OnLoadResult
 
       getExtractscss(result.styles, context, queryFilename)
 
-      return codeAssemble(result, filename, (code) => {
+      return codeAssemble(result, filename, context, (code) => {
         handleExtract(result, context)
         return context.option.extractscss ? addCode(code, queryFilename) : code
       }) as OnLoadResult

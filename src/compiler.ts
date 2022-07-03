@@ -3,6 +3,7 @@ import componentCompiler from '@vue/component-compiler'
 import tempcompiler from 'vue-template-compiler'
 import compilerUtil from '@vue/component-compiler-utils'
 import hashSum from 'hash-sum'
+import { Context } from '.'
 
 export type StylesType = componentCompiler.StyleCompileResult[]
 export type TemplateType = (compilerUtil.TemplateCompileResult & { functional: boolean }) | undefined
@@ -27,7 +28,7 @@ export interface CompilerResult {
   compiler: componentCompiler.SFCCompiler
 }
 
-export function compiler(sourcePath: string, filename: string, callback?: CallbackInterface) {
+export function compiler(sourcePath: string, filename: string, ctx:Context callback?: CallbackInterface) {
   const sourceCode = readFileSync(sourcePath, { encoding: 'utf-8' })
   const scopeId = `data-v-${hashSum(sourcePath)}`
   const descriptor = compilerUtil.parse({
@@ -37,7 +38,7 @@ export function compiler(sourcePath: string, filename: string, callback?: Callba
     compiler: tempcompiler as any,
   })
 
-  const compiler = componentCompiler.createDefaultCompiler()
+  const compiler = componentCompiler.createDefaultCompiler(ctx.option.createDefaultCompiler)
 
   const styles = descriptor.styles.map(style => compiler.compileStyle(filename, scopeId, style))
   const template = descriptor.template ? compiler.compileTemplate(filename, descriptor.template) : undefined
@@ -54,8 +55,8 @@ export function compiler(sourcePath: string, filename: string, callback?: Callba
   }
 }
 
-export function codeAssemble(assembleOption: CompilerResult, filename: string, callback: (code: string) => string) {
-  const { code } = componentCompiler.assemble(assembleOption.compiler, filename, assembleOption)
+export function codeAssemble(assembleOption: CompilerResult, filename: string, context: Context, callback: (code: string) => string) {
+  const { code } = componentCompiler.assemble(assembleOption.compiler, filename, assembleOption, context.option.assembleOptions)
   return {
     contents: callback(code),
     loader: assembleOption.script?.lang,
