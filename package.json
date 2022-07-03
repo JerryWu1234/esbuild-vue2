@@ -58,17 +58,17 @@
     "vue": "~2.6.14",
     "vue-template-compiler": "~2.6.14"
   },
-  "homepage": "https://github.com/wulinsheng123/auto-monitor#readme",
+  "homepage": "https://github.com/wulinsheng123/esbuild-vue2#readme",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wulinsheng123/auto-monitor.git"
+    "url": "git+https://github.com/wulinsheng123/esbuild-vue2.git"
   },
   "bugs": {
-    "url": "https://github.com/wulinsheng123/auto-monitor/issues"
+    "url": "https://github.com/wulinsheng123/esbuild-vue2/issues"
   },
   "dependencies": {},
   "peerDependencies": {
